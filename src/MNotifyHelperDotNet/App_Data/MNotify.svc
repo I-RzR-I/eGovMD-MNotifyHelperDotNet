@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="MNotifyService" targetNamespace="https://mnotify.gov.md" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="https://mnotify.gov.md" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+	<wsdl:types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="https://mnotify.gov.md" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			<xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+			<xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+			<xs:element name="PostSimpleNotification">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+						<xs:element minOccurs="0" name="sender" nillable="true" type="xs:string"/>
+						<xs:element minOccurs="0" name="recipient" nillable="true" type="xs:string"/>
+						<xs:element minOccurs="0" name="subject" nillable="true" type="xs:string"/>
+						<xs:element minOccurs="0" name="contentType" type="tns:NotificationContentType"/>
+						<xs:element minOccurs="0" name="content" nillable="true" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:simpleType name="NotificationContentType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Text">
+						<xs:annotation>
+							<xs:appinfo>
+								<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Html">
+						<xs:annotation>
+							<xs:appinfo>
+								<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:element name="NotificationContentType" nillable="true" type="tns:NotificationContentType"/>
+			<xs:element name="PostSimpleNotificationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="PostSimpleNotificationResult" nillable="true" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="PostNotificationRequest">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="request" nillable="true" type="tns:NotificationRequest"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:complexType name="NotificationRequest">
+				<xs:sequence>
+					<xs:element name="Contents" nillable="true" type="tns:ArrayOfNotificationContent"/>
+					<xs:element minOccurs="0" name="CopyRecipients" nillable="true" type="q1:ArrayOfstring" xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="HiddenRecipients" nillable="true" type="q2:ArrayOfstring" xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Importance" type="tns:NotificationImportance">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Recipients" nillable="true" type="q3:ArrayOfstring" xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Sender" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="SeparateRecipients" type="xs:boolean">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Type" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="NotificationRequest" nillable="true" type="tns:NotificationRequest"/>
+			<xs:complexType name="ArrayOfNotificationContent">
+				<xs:sequence>
+					<xs:element minOccurs="0" maxOccurs="unbounded" name="NotificationContent" nillable="true" type="tns:NotificationContent"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ArrayOfNotificationContent" nillable="true" type="tns:ArrayOfNotificationContent"/>
+			<xs:complexType name="NotificationContent">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="Attachments" nillable="true" type="tns:ArrayOfNotificationAttachment">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Content" nillable="true" type="xs:string"/>
+					<xs:element minOccurs="0" name="Language" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Subject" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Type" type="tns:NotificationContentType"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="NotificationContent" nillable="true" type="tns:NotificationContent"/>
+			<xs:complexType name="ArrayOfNotificationAttachment">
+				<xs:sequence>
+					<xs:element minOccurs="0" maxOccurs="unbounded" name="NotificationAttachment" nillable="true" type="tns:NotificationAttachment"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ArrayOfNotificationAttachment" nillable="true" type="tns:ArrayOfNotificationAttachment"/>
+			<xs:complexType name="NotificationAttachment">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="Content" nillable="true" type="xs:base64Binary">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="ID" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Name" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Type" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element minOccurs="0" name="Uri" nillable="true" type="xs:string">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="NotificationAttachment" nillable="true" type="tns:NotificationAttachment"/>
+			<xs:simpleType name="NotificationImportance">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Normal"/>
+					<xs:enumeration value="Low"/>
+					<xs:enumeration value="High"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:element name="NotificationImportance" nillable="true" type="tns:NotificationImportance"/>
+			<xs:element name="PostNotificationRequestResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="PostNotificationRequestResult" nillable="true" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetNotificationStatus">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="notificationID" nillable="true" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetNotificationStatusResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="GetNotificationStatusResult" nillable="true" type="tns:ArrayOfNotificationStatus"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:complexType name="ArrayOfNotificationStatus">
+				<xs:sequence>
+					<xs:element minOccurs="0" maxOccurs="unbounded" name="NotificationStatus" nillable="true" type="tns:NotificationStatus"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ArrayOfNotificationStatus" nillable="true" type="tns:ArrayOfNotificationStatus"/>
+			<xs:complexType name="NotificationStatus">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="ChannelStatus" nillable="true" type="tns:ArrayOfNotificationChannelStatus">
+						<xs:annotation>
+							<xs:appinfo>
+								<DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="GeneralStatus" type="tns:NotificationDeliveryStatus"/>
+					<xs:element name="Recipient" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="NotificationStatus" nillable="true" type="tns:NotificationStatus"/>
+			<xs:complexType name="ArrayOfNotificationChannelStatus">
+				<xs:sequence>
+					<xs:element minOccurs="0" maxOccurs="unbounded" name="NotificationChannelStatus" nillable="true" type="tns:NotificationChannelStatus"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ArrayOfNotificationChannelStatus" nillable="true" type="tns:ArrayOfNotificationChannelStatus"/>
+			<xs:complexType name="NotificationChannelStatus">
+				<xs:sequence>
+					<xs:element name="Channel" type="tns:NotificationDeliveryChannel"/>
+					<xs:element name="Status" type="tns:NotificationDeliveryStatus"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="NotificationChannelStatus" nillable="true" type="tns:NotificationChannelStatus"/>
+			<xs:simpleType name="NotificationDeliveryChannel">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="EMail">
+						<xs:annotation>
+							<xs:appinfo>
+								<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="SMS">
+						<xs:annotation>
+							<xs:appinfo>
+								<EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:element name="NotificationDeliveryChannel" nillable="true" type="tns:NotificationDeliveryChannel"/>
+			<xs:simpleType name="NotificationDeliveryStatus">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Pending"/>
+					<xs:enumeration value="Sent"/>
+					<xs:enumeration value="Confirmed"/>
+					<xs:enumeration value="Failed"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:element name="NotificationDeliveryStatus" nillable="true" type="tns:NotificationDeliveryStatus"/>
+		</xs:schema>
+		<xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/">
+			<xs:element name="anyType" nillable="true" type="xs:anyType"/>
+			<xs:element name="anyURI" nillable="true" type="xs:anyURI"/>
+			<xs:element name="base64Binary" nillable="true" type="xs:base64Binary"/>
+			<xs:element name="boolean" nillable="true" type="xs:boolean"/>
+			<xs:element name="byte" nillable="true" type="xs:byte"/>
+			<xs:element name="dateTime" nillable="true" type="xs:dateTime"/>
+			<xs:element name="decimal" nillable="true" type="xs:decimal"/>
+			<xs:element name="double" nillable="true" type="xs:double"/>
+			<xs:element name="float" nillable="true" type="xs:float"/>
+			<xs:element name="int" nillable="true" type="xs:int"/>
+			<xs:element name="long" nillable="true" type="xs:long"/>
+			<xs:element name="QName" nillable="true" type="xs:QName"/>
+			<xs:element name="short" nillable="true" type="xs:short"/>
+			<xs:element name="string" nillable="true" type="xs:string"/>
+			<xs:element name="unsignedByte" nillable="true" type="xs:unsignedByte"/>
+			<xs:element name="unsignedInt" nillable="true" type="xs:unsignedInt"/>
+			<xs:element name="unsignedLong" nillable="true" type="xs:unsignedLong"/>
+			<xs:element name="unsignedShort" nillable="true" type="xs:unsignedShort"/>
+			<xs:element name="char" nillable="true" type="tns:char"/>
+			<xs:simpleType name="char">
+				<xs:restriction base="xs:int"/>
+			</xs:simpleType>
+			<xs:element name="duration" nillable="true" type="tns:duration"/>
+			<xs:simpleType name="duration">
+				<xs:restriction base="xs:duration">
+					<xs:pattern value="\-?P(\d*D)?(T(\d*H)?(\d*M)?(\d*(\.\d*)?S)?)?"/>
+					<xs:minInclusive value="-P10675199DT2H48M5.4775808S"/>
+					<xs:maxInclusive value="P10675199DT2H48M5.4775807S"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:element name="guid" nillable="true" type="tns:guid"/>
+			<xs:simpleType name="guid">
+				<xs:restriction base="xs:string">
+					<xs:pattern value="[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:attribute name="FactoryType" type="xs:QName"/>
+			<xs:attribute name="Id" type="xs:ID"/>
+			<xs:attribute name="Ref" type="xs:IDREF"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+			<xs:complexType name="ArrayOfstring">
+				<xs:sequence>
+					<xs:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ArrayOfstring" nillable="true" type="tns:ArrayOfstring"/>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="IMNotify_PostSimpleNotification_InputMessage">
+		<wsdl:part name="parameters" element="tns:PostSimpleNotification"/>
+	</wsdl:message>
+	<wsdl:message name="IMNotify_PostSimpleNotification_OutputMessage">
+		<wsdl:part name="parameters" element="tns:PostSimpleNotificationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="IMNotify_PostNotificationRequest_InputMessage">
+		<wsdl:part name="parameters" element="tns:PostNotificationRequest"/>
+	</wsdl:message>
+	<wsdl:message name="IMNotify_PostNotificationRequest_OutputMessage">
+		<wsdl:part name="parameters" element="tns:PostNotificationRequestResponse"/>
+	</wsdl:message>
+	<wsdl:message name="IMNotify_GetNotificationStatus_InputMessage">
+		<wsdl:part name="parameters" element="tns:GetNotificationStatus"/>
+	</wsdl:message>
+	<wsdl:message name="IMNotify_GetNotificationStatus_OutputMessage">
+		<wsdl:part name="parameters" element="tns:GetNotificationStatusResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="IMNotify">
+		<wsdl:operation name="PostSimpleNotification">
+			<wsdl:input wsaw:Action="https://mnotify.gov.md/IMNotify/PostSimpleNotification" message="tns:IMNotify_PostSimpleNotification_InputMessage"/>
+			<wsdl:output wsaw:Action="https://mnotify.gov.md/IMNotify/PostSimpleNotificationResponse" message="tns:IMNotify_PostSimpleNotification_OutputMessage"/>
+		</wsdl:operation>
+		<wsdl:operation name="PostNotificationRequest">
+			<wsdl:input wsaw:Action="https://mnotify.gov.md/IMNotify/PostNotificationRequest" message="tns:IMNotify_PostNotificationRequest_InputMessage"/>
+			<wsdl:output wsaw:Action="https://mnotify.gov.md/IMNotify/PostNotificationRequestResponse" message="tns:IMNotify_PostNotificationRequest_OutputMessage"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetNotificationStatus">
+			<wsdl:input wsaw:Action="https://mnotify.gov.md/IMNotify/GetNotificationStatus" message="tns:IMNotify_GetNotificationStatus_InputMessage"/>
+			<wsdl:output wsaw:Action="https://mnotify.gov.md/IMNotify/GetNotificationStatusResponse" message="tns:IMNotify_GetNotificationStatus_OutputMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="BasicHttpBinding_IMNotify" type="tns:IMNotify">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="PostSimpleNotification">
+			<soap:operation soapAction="https://mnotify.gov.md/IMNotify/PostSimpleNotification" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="PostNotificationRequest">
+			<soap:operation soapAction="https://mnotify.gov.md/IMNotify/PostNotificationRequest" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetNotificationStatus">
+			<soap:operation soapAction="https://mnotify.gov.md/IMNotify/GetNotificationStatus" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="MNotifyService">
+		<wsdl:port name="BasicHttpBinding_IMNotify" binding="tns:BasicHttpBinding_IMNotify">
+			<soap:address location="https://mnotify.gov.md:8443/MNotify.svc"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
