@@ -29,7 +29,7 @@ using System.Resources;
 
 [assembly: AssemblyCompany("RzR ®")]
 [assembly: AssemblyProduct("e-GOV MD MNotifyHelperDotNet")]
-[assembly: AssemblyCopyright("Copyright © 2022-2023 RzR All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2022-2024 RzR All rights reserved.")]
 [assembly: AssemblyTrademark("® RzR™")]
 [assembly: AssemblyDescription("A wrapper for governmental notification service for a quick way to implement it with a few configuration settings. Service is provided by an e-governance agency (https://egov.md/), named `MNotify`, available in the Republic of Moldova.")]
 
@@ -41,6 +41,6 @@ using System.Resources;
 
 [assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.MainAssembly)]
 
-[assembly: AssemblyVersion("1.0.1.0749")]
-[assembly: AssemblyFileVersion("1.0.1.0749")]
-[assembly: AssemblyInformationalVersion("1.0.1.*")]
+[assembly: AssemblyVersion("1.0.2.7675")]
+[assembly: AssemblyFileVersion("1.0.2.7675")]
+[assembly: AssemblyInformationalVersion("1.0.2.7675")]
