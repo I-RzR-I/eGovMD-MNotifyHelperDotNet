@@ -20,7 +20,8 @@
 
 using System;
 using System.Configuration;
-using AggregatedGenericResultMessage.Extensions.Common;
+using DomainCommonExtensions.CommonExtensions;
+using DomainCommonExtensions.DataTypeExtensions;
 using MNotifyHelperDotNet.Helpers.ConfSection;
 using MNotifyHelperDotNet.Models;
 

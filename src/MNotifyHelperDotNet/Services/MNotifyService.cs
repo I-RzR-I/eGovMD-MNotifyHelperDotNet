@@ -25,10 +25,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AggregatedGenericResultMessage;
 using AggregatedGenericResultMessage.Abstractions;
-using AggregatedGenericResultMessage.Extensions.Common;
 using AggregatedGenericResultMessage.Extensions.Result;
 using AggregatedGenericResultMessage.Extensions.Result.Messages;
 using DomainCommonExtensions.ArraysExtensions;
+using DomainCommonExtensions.CommonExtensions;
 using DomainCommonExtensions.DataTypeExtensions;
 using MNotifyHelperDotNet.Abstractions;
 using MNotifyHelperDotNet.Configurations.Clients;
@@ -183,13 +183,13 @@ namespace MNotifyHelperDotNet.Services
 #if NET45
         /// <inheritdoc />
         public IResult<NotificationResult> SendTextNotificationByEmail(NotificationRequestModel request)
-            => SendNotificationByEmail(request, Enums.NotificationContentType.Text, false)
+            => SendNotificationByEmail(request, NotificationContentType.Text, false)
             .GetAwaiter()
             .GetResult();
 
         /// <inheritdoc />
         public IResult<NotificationResult> SendHtmlNotificationByEmail(NotificationRequestModel request)
-            => SendNotificationByEmail(request, Enums.NotificationContentType.Html, false)
+            => SendNotificationByEmail(request, NotificationContentType.Html, false)
                 .GetAwaiter()
                 .GetResult();
 
