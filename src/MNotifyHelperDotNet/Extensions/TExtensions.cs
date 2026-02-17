@@ -28,7 +28,7 @@ namespace MNotifyHelperDotNet.Extensions
     ///     T extensions
     /// </summary>
     /// <remarks></remarks>
-    public static class TExtensions
+    internal static class TExtensions
     {
         /// <summary>
         ///     Get sub array
