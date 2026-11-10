@@ -20,8 +20,8 @@
 
 using System;
 using System.Configuration;
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Text;
 using MNotifyHelperDotNet.Helpers.ConfSection;
 using MNotifyHelperDotNet.Models;
 

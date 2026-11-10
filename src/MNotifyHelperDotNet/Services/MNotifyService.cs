@@ -23,13 +23,12 @@ using System.Linq;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
-using AggregatedGenericResultMessage;
-using AggregatedGenericResultMessage.Abstractions;
-using AggregatedGenericResultMessage.Extensions.Result;
-using AggregatedGenericResultMessage.Extensions.Result.Messages;
-using DomainCommonExtensions.ArraysExtensions;
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
+using RzR.Extensions.Domain.Collections;
+using RzR.Extensions.Domain.Primitives;
+using RzR.ResultMessage;
+using RzR.ResultMessage.Abstractions;
+using RzR.ResultMessage.Extensions.Result;
+using RzR.ResultMessage.Extensions.Result.Messages;
 using MNotifyHelperDotNet.Abstractions;
 using MNotifyHelperDotNet.Configurations.Clients;
 using MNotifyHelperDotNet.Helpers;
@@ -42,7 +41,7 @@ using MNotifyRemoteService;
 using NotificationChannelStatus = MNotifyHelperDotNet.Models.Result.NotificationChannelStatus;
 using NotificationContentType = MNotifyHelperDotNet.Enums.NotificationContentType;
 
-#if NETSTANDARD2_0_OR_GREATER || NET|| NETCOREAPP3_1_OR_GREATER
+#if NETSTANDARD2_0_OR_GREATER || NET || NETCOREAPP3_1_OR_GREATER
 using Microsoft.Extensions.Options;
 #endif
 
@@ -62,7 +61,9 @@ namespace MNotifyHelperDotNet.Services
     /// <inheritdoc cref="IMNotifyService" />
     public class MNotifyService : IMNotifyService
     {
+#if !NET45
         private readonly IMNotify _mNotify;
+#endif
 #pragma warning disable IDE0052 // Remove unread private members
         private readonly RemoteMNotifyOptions _mNotifyOptions;
 #pragma warning restore IDE0052 // Remove unread private members
@@ -83,6 +84,18 @@ namespace MNotifyHelperDotNet.Services
 
 #if NET45
         /// <summary>
+        ///     Current MNotify client; read on every call because Ping can replace the static instance
+        /// </summary>
+        private static IMNotify CurrentClient => Volatile.Read(ref MNotifyClientInternal.Instance);
+#else
+        /// <summary>
+        ///     Current MNotify client
+        /// </summary>
+        private IMNotify CurrentClient => _mNotify;
+#endif
+
+#if NET45
+        /// <summary>
         ///     MNotify service instance
         /// </summary>
         /// <remarks></remarks>
@@ -97,7 +110,6 @@ namespace MNotifyHelperDotNet.Services
         public MNotifyService()
         {
             _mNotifyOptions = MNotifyPostConfigureOptionsNetFramework.InitOptions();
-            _mNotify = MNotifyClientInternal.Instance;
         }
 
 #endif
@@ -138,10 +150,10 @@ namespace MNotifyHelperDotNet.Services
                 var sender = SenderRecipientHelper.GetSenderRecipientForSimpleNotification(request.Sender);
                 var recipient = SenderRecipientHelper.GetSenderRecipientForSimpleNotification(request.Recipient);
                 var notificationId = isAsync.Equals(true)
-                    ? await _mNotify
+                    ? await CurrentClient
                         .PostSimpleNotificationAsync(request.NotificationType, sender, recipient, request.Subject,
                             request.ContentType.MapNotificationContentTypeToServiceEnum(), request.Content)
-                    : _mNotify
+                    : CurrentClient
                         // ReSharper disable once MethodHasAsyncOverload
                         .PostSimpleNotification(request.NotificationType, sender, recipient, request.Subject,
                             request.ContentType.MapNotificationContentTypeToServiceEnum(), request.Content);
@@ -239,9 +251,9 @@ namespace MNotifyHelperDotNet.Services
                 };
 
                 var notificationId = isAsync.Equals(true)
-                    ? await _mNotify.PostNotificationRequestAsync(notificationRequest)
+                    ? await CurrentClient.PostNotificationRequestAsync(notificationRequest)
                     // ReSharper disable once MethodHasAsyncOverload
-                    : _mNotify.PostNotificationRequest(notificationRequest);
+                    : CurrentClient.PostNotificationRequest(notificationRequest);
 
                 return Result<NotificationResult>.Success(new NotificationResult(notificationId));
             }
@@ -345,9 +357,9 @@ namespace MNotifyHelperDotNet.Services
                 };
 
                 var requestNotificationId = isAsync.Equals(true)
-                    ? await _mNotify.PostNotificationRequestAsync(notificationRequest)
+                    ? await CurrentClient.PostNotificationRequestAsync(notificationRequest)
                     // ReSharper disable once MethodHasAsyncOverload
-                    : _mNotify.PostNotificationRequest(notificationRequest);
+                    : CurrentClient.PostNotificationRequest(notificationRequest);
 
                 return Result<NotificationResult>.Success(new NotificationResult(requestNotificationId));
             }
@@ -410,9 +422,9 @@ namespace MNotifyHelperDotNet.Services
             try
             {
                 var status = isAsync.Equals(true)
-                    ? await _mNotify.GetNotificationStatusAsync(notification.NotificationId)
+                    ? await CurrentClient.GetNotificationStatusAsync(notification.NotificationId)
                     // ReSharper disable once MethodHasAsyncOverload
-                    : _mNotify.GetNotificationStatus(notification.NotificationId);
+                    : CurrentClient.GetNotificationStatus(notification.NotificationId);
                 var result = status.Select(x => new NotificationStatusResult
                 {
                     Recipient = x.Recipient,

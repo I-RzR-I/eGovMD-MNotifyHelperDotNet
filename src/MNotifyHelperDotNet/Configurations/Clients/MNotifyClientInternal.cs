@@ -21,11 +21,14 @@
 
 using System;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using AggregatedGenericResultMessage;
-using AggregatedGenericResultMessage.Extensions.Result.Messages;
-using DomainCommonExtensions.CommonExtensions;
+using System.ServiceModel.Description;
+using System.Threading;
+using RzR.Extensions.Domain.Primitives;
+using RzR.ResultMessage;
+using RzR.ResultMessage.Extensions.Result.Messages;
 using MNotifyHelperDotNet.Models;
 using MNotifyRemoteService;
 
@@ -44,6 +47,34 @@ namespace MNotifyHelperDotNet.Configurations.Clients
     /// <inheritdoc />
     public class MNotifyClientInternal : MNotifyClient
     {
+        /// <summary>
+        ///     Serializes the replacement of an unusable <see cref="Instance" />
+        /// </summary>
+        private static readonly object RecreateLock = new object();
+
+#if !NET45
+        /// <summary>
+        ///     True when <see cref="Ping" /> created this client, so Ping may abort it when it is replaced
+        /// </summary>
+        private bool _createdByPing;
+#endif
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MNotifyClientInternal" /> class without publishing it as
+        ///     <see cref="Instance" />
+        /// </summary>
+        /// <param name="binding">Client binding</param>
+        /// <param name="remoteAddress">Remote service address</param>
+        /// <param name="certificate">Client certificate</param>
+        /// <remarks>Used only by <see cref="Ping" />, which publishes the fully configured client itself.</remarks>
+        private MNotifyClientInternal(Binding binding, EndpointAddress remoteAddress, X509Certificate2 certificate) : base(binding, remoteAddress)
+        {
+            ClientCredentials.ClientCertificate.Certificate = certificate;
+#if !NET45
+            _createdByPing = true;
+#endif
+        }
+
 #if NETSTANDARD2_0_OR_GREATER || NET || NETCOREAPP3_1_OR_GREATER
         /// <inheritdoc />
         public MNotifyClientInternal(IOptions<RemoteMNotifyOptions> options) : this(options.Value.BasicHttpsBinding,
@@ -54,7 +85,12 @@ namespace MNotifyHelperDotNet.Configurations.Clients
         }
 
         /// <inheritdoc />
-        public MNotifyClientInternal(Binding binding, EndpointAddress remoteAddress) : base(binding, remoteAddress) => Instance = this;
+        public MNotifyClientInternal(Binding binding, EndpointAddress remoteAddress) : base(binding, remoteAddress)
+        {
+            var previous = Interlocked.Exchange(ref Instance, this);
+            if (previous != null && previous._createdByPing)
+                AbortQuietly(previous);
+        }
 
         /// <summary>
         ///     Internal signing service
@@ -87,7 +123,7 @@ namespace MNotifyHelperDotNet.Configurations.Clients
         /// </summary>
         /// <remarks></remarks>
 #pragma warning disable IDE0090 // Use 'new(...)'
-        public static readonly MNotifyClientInternal Instance = new MNotifyClientInternal(_remoteMNotifyOptions.BasicHttpsBinding, _remoteMNotifyOptions.EndpointAddress);
+        public static MNotifyClientInternal Instance = new MNotifyClientInternal(_remoteMNotifyOptions.BasicHttpsBinding, _remoteMNotifyOptions.EndpointAddress);
 #pragma warning restore IDE0090 // Use 'new(...)'
 #endif
 
@@ -95,7 +131,7 @@ namespace MNotifyHelperDotNet.Configurations.Clients
         ///     Ping MNotify service
         /// </summary>
         /// <returns></returns>
-        /// <remarks></remarks>
+        /// <remarks>A Closed or Faulted <see cref="Instance" /> is replaced by a fresh client before answering.</remarks>
         public Result<PingResponse> Ping()
         {
             var client = Instance;
@@ -104,16 +140,8 @@ namespace MNotifyHelperDotNet.Configurations.Clients
 
             try
             {
-                if (client.ChannelFactory.State != CommunicationState.Opened &&
-                    client.ChannelFactory.State == CommunicationState.Closed)
-                {
-#if NETSTANDARD2_0_OR_GREATER || NET
-                    client.OpenAsync().GetAwaiter().GetResult();
-#endif
-#if NET45
-                    client.Open();
-#endif
-                }
+                if (IsUnusable(client))
+                    Recreate(client);
 
                 stopwatch.Stop();
 
@@ -126,6 +154,101 @@ namespace MNotifyHelperDotNet.Configurations.Clients
                 result.SetResult(new PingResponse { Message = "Communication problem: " + e.Message, Time = $"{stopwatch.Elapsed}", IsSuccess = false });
 
                 return result;
+            }
+        }
+
+        /// <summary>
+        ///     Check whether the client or its channel factory is Closed or Faulted
+        /// </summary>
+        /// <param name="client">Client</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        private static bool IsUnusable(MNotifyClientInternal client)
+            => client.State is CommunicationState.Closed or CommunicationState.Faulted ||
+               client.ChannelFactory.State is CommunicationState.Closed or CommunicationState.Faulted;
+
+        /// <summary>
+        ///     Abort a client and ignore any failure
+        /// </summary>
+        /// <param name="client">Client to abort</param>
+        /// <remarks></remarks>
+        private static void AbortQuietly(MNotifyClientInternal client)
+        {
+            try
+            {
+                client.Abort();
+            }
+            catch (Exception)
+            {
+                // best-effort: the client is already broken, a failing abort must not hide the Ping result
+            }
+        }
+
+#if !NET45
+        /// <summary>
+        ///     Read the client certificate of a client in any communication state
+        /// </summary>
+        /// <param name="client">Client</param>
+        /// <returns>The certificate, or null when the client has none</returns>
+        /// <remarks>
+        ///     The ClientCredentials property of a client in any state other than Created or Opening (Opened included) returns a
+        ///     new empty instance, so the credentials are taken from the endpoint behaviors, where the original instance stays
+        ///     registered.
+        /// </remarks>
+        private static X509Certificate2 GetClientCertificate(MNotifyClientInternal client)
+        {
+            foreach (var behavior in client.Endpoint.EndpointBehaviors)
+            {
+                if (behavior is ClientCredentials credentials)
+                    return credentials.ClientCertificate.Certificate;
+            }
+
+            return null;
+        }
+#endif
+
+        /// <summary>
+        ///     Replace an unusable <see cref="Instance" /> with a fresh client
+        /// </summary>
+        /// <param name="old">The unusable client that Ping observed</param>
+        /// <returns>The client that is <see cref="Instance" /> after the call</returns>
+        /// <remarks>
+        ///     Settings and the abort decision come from the instance re-read under the lock. The fresh client is published
+        ///     with a compare-exchange because the public constructor publishes without taking the lock. A client that Ping
+        ///     did not create (DI or consumer owned) is never aborted here, except on net45 where the library owns it.
+        /// </remarks>
+        private static MNotifyClientInternal Recreate(MNotifyClientInternal old)
+        {
+            lock (RecreateLock)
+            {
+                var current = Volatile.Read(ref Instance);
+                if (current != null && !IsUnusable(current))
+                    return current;
+
+                var source = current ?? old;
+#if NET45
+                var fresh = new MNotifyClientInternal(_remoteMNotifyOptions.BasicHttpsBinding,
+                    _remoteMNotifyOptions.EndpointAddress, _remoteMNotifyOptions.ServiceCertificate);
+#else
+                var fresh = new MNotifyClientInternal(source.Endpoint.Binding, source.Endpoint.Address,
+                    GetClientCertificate(source));
+#endif
+                var winner = Interlocked.CompareExchange(ref Instance, fresh, current);
+                if (!ReferenceEquals(winner, current))
+                {
+                    AbortQuietly(fresh);
+
+                    return winner;
+                }
+
+#if NET45
+                AbortQuietly(source);
+#else
+                if (source._createdByPing)
+                    AbortQuietly(source);
+#endif
+
+                return fresh;
             }
         }
     }

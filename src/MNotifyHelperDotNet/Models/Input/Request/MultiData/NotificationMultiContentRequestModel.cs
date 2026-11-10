@@ -19,8 +19,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using EntityMaxLengthTrim.Attributes;
-using EntityMaxLengthTrim.Interceptors;
+using RzR.Extensions.EntityLength.Attributes;
+using RzR.Extensions.EntityLength.Interceptors;
 using MNotifyHelperDotNet.Enums;
 
 #endregion

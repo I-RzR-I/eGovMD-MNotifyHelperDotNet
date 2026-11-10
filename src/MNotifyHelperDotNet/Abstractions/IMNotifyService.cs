@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AggregatedGenericResultMessage.Abstractions;
+using RzR.ResultMessage.Abstractions;
 using MNotifyHelperDotNet.Models.Input.Request;
 using MNotifyHelperDotNet.Models.Input.Request.MultiData;
 using MNotifyHelperDotNet.Models.Result;
