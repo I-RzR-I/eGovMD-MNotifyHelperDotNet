@@ -1,3 +1,7 @@
+### **v2.0.0.7656** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 10-11-2026
+* [feacc5b] (RzR) -> Auto commit uncommited files
+* [331f34d] (RzR) -> Migrate reference packages and add improvements.
+
 ### **v1.0.4.111** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 25-02-2026
 * [20e253e] (RzR) -> Auto commit uncommited files
 * [20e253e] (RzR) -> Upgrade reference package version (fixed version)

@@ -19,9 +19,9 @@
 #region U S A G E S
 
 using System;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using DomainCommonExtensions.DataTypeExtensions;
+using RzR.Extensions.Domain.Primitives;
+using RzR.Extensions.Domain.Text;
 using MNotifyHelperDotNet.Helpers;
 using MNotifyHelperDotNet.Models;
 // ReSharper disable CollectionNeverUpdated.Local
@@ -91,19 +91,16 @@ namespace MNotifyHelperDotNet.Configurations.Options
                 }
             };
 
-            var certificate = new X509Certificate2Collection(CertificateLoader.Private(
+            var certificate = CertificateLoader.Private(
                 mSignOptions.ServiceCertificatePath,
-                mSignOptions.ServiceCertificatePassword));
+                mSignOptions.ServiceCertificatePassword);
 
-            if (certificate.Count.IsZero())
+            if (certificate.IsNull())
             {
                 throw new ApplicationException("Invalid service certificate path or password");
             }
 
-            if (certificate.Count.IsGreaterThanZero())
-            {
-                mSignOptions.ServiceCertificate = certificate[0];
-            }
+            mSignOptions.ServiceCertificate = certificate;
 
             mSignOptions.EndpointAddress = new EndpointAddress(mSignOptions.ServiceClientAddress);
 

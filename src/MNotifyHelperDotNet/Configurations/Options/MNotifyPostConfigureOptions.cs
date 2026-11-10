@@ -19,10 +19,9 @@
 #region U S A G E S
 
 using System;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using DomainCommonExtensions.DataTypeExtensions;
 using Microsoft.Extensions.Options;
+using RzR.Extensions.Domain.Primitives;
 using MNotifyHelperDotNet.Models;
 
 // ReSharper disable CollectionNeverUpdated.Local
@@ -54,19 +53,16 @@ namespace MNotifyHelperDotNet.Configurations.Options
                 throw new ArgumentException($"Please provide a {nameof(mNotifyOptions.ServiceCertificatePassword)}");
             }
 
-            var certificate = new X509Certificate2Collection(CertificateLoader.Private(
+            var certificate = CertificateLoader.Private(
                 mNotifyOptions.ServiceCertificatePath,
-                mNotifyOptions.ServiceCertificatePassword));
+                mNotifyOptions.ServiceCertificatePassword);
 
-            if (certificate.Count.IsZero())
+            if (certificate.IsNull())
             {
                 throw new ApplicationException("Invalid service certificate path or password");
             }
 
-            if (certificate.Count.IsGreaterThanZero())
-            {
-                mNotifyOptions.ServiceCertificate = certificate[0];
-            }
+            mNotifyOptions.ServiceCertificate = certificate;
 
             mNotifyOptions.BasicHttpsBinding = new BasicHttpsBinding
             {
