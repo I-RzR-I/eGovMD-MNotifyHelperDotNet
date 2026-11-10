@@ -6,15 +6,8 @@
 
 One important reason for developing this repository is to quickly implement the governmental notify service provided by [e-governance agency](https://egov.md/), named `MNotify`, available in the Republic of Moldova.<br/>
 
-<p align="center">
-    <a href="https://mnotify.gov.md">
-        <img src="assets/mnotify.svg" style="zoom: 3.0;"/>
-    </a>
-</p>
 
-<br/>
-
-Proceed to the service portal where you can read more about them by clicking [here](https://mnotify.gov.md).
+Proceed to the service portal where you can read more about them on [<a href="https://mnotify.gov.md"><img src="assets/mnotify.svg" width="100px"/></a>](https://mnotify.gov.md).
 
 The current repository appears as a result of several implementations in projects from scratch, losing a lot of time and desire for a more easy way of implementation in new projects.
 This repository is a wrapper for the currently available service. Using a few configuration parameters from the application settings file `appsettings.json`, `app.config`, or `web.config` you may implement them very easily into your own application.<br/>
